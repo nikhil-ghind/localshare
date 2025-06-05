@@ -1,0 +1,10 @@
+build/
+build_*/
+localshare
+*.o
+*.a
+*.log
+.cache/
+compile_commands.json
+.vscode/
+.idea/
