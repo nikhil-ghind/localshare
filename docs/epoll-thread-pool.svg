@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 360" width="880" height="360" role="img" aria-label="Animation of epoll accepting connections and handing parsed requests to a thread pool that streams files with sendfile">
+  <title>localshare: the epoll loop never blocks on a file transfer</title>
+  <text x="20" y="28" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="bold" fill="#8b949e">One epoll thread, N workers &#8212; reads stay fast while sendfile runs long</text>
+  <text x="20" y="48" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#8b949e">The loop only reads bytes until the header terminator; everything expensive happens on a pool worker.</text>
+  <rect x="30" y="100" width="110" height="180" rx="6" fill="none" stroke="#8b949e" stroke-width="1.5"/>
+  <text x="85" y="178" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#8b949e">LAN clients</text>
+  <text x="85" y="197" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#8b949e">keep-alive</text>
+  <text x="85" y="213" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#8b949e">connections</text>
+  <rect x="230" y="150" width="160" height="80" rx="6" fill="none" stroke="#8b949e" stroke-width="1.5"/>
+  <text x="310" y="180" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#8b949e">epoll loop</text>
+  <text x="310" y="198" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#8b949e">edge-triggered</text>
+  <text x="310" y="214" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#8b949e">accept4 + recv</text>
+  <rect x="450" y="150" width="90" height="80" rx="6" fill="none" stroke="#8b949e" stroke-width="1.5"/>
+  <text x="495" y="182" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#8b949e">job</text>
+  <text x="495" y="198" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#8b949e">queue</text>
+  <text x="495" y="216" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#8b949e">mutex + cv</text>
+  <rect x="600" y="90" width="200" height="54" rx="6" fill="none" stroke="#8b949e" stroke-width="1.5"/>
+  <text x="700" y="112" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="bold" fill="#8b949e">worker 1</text>
+  <text x="700" y="130" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#8b949e">sendfile, 64 KiB chunks</text>
+  <rect x="600" y="165" width="200" height="54" rx="6" fill="none" stroke="#8b949e" stroke-width="1.5"/>
+  <text x="700" y="187" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="bold" fill="#8b949e">worker 2</text>
+  <text x="700" y="205" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#8b949e">sendfile, 64 KiB chunks</text>
+  <rect x="600" y="240" width="200" height="54" rx="6" fill="none" stroke="#8b949e" stroke-width="1.5"/>
+  <text x="700" y="262" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="bold" fill="#8b949e">worker 3</text>
+  <text x="700" y="280" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#8b949e">sendfile, 64 KiB chunks</text>
+  <path d="M 140 190 H 226" stroke="#8b949e" stroke-width="1" stroke-dasharray="3 5" fill="none"/>
+  <path d="M 390 190 H 446" stroke="#8b949e" stroke-width="1" stroke-dasharray="3 5" fill="none"/>
+  <path d="M 540 190 L 596 117" stroke="#8b949e" stroke-width="1" stroke-dasharray="3 5" fill="none"/>
+  <path d="M 540 190 L 596 192" stroke="#8b949e" stroke-width="1" stroke-dasharray="3 5" fill="none"/>
+  <path d="M 540 190 L 596 267" stroke="#8b949e" stroke-width="1" stroke-dasharray="3 5" fill="none"/>
+  <circle r="7" fill="#6ea8fe" stroke="#a8c8ff" stroke-width="1">
+    <animateMotion path="M 140 190 H 540 L 600 117" dur="12s" begin="0s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.04;0.08;0.12;0.20;0.26;1" keyPoints="0;0.182;0.182;0.627;0.627;1;1"/>
+    <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.26;0.27;1" dur="12s" begin="0s" calcMode="discrete" repeatCount="indefinite"/>
+  </circle>
+  <rect x="606" y="134" width="0" height="5" rx="2" fill="#3f9e6c">
+    <animate attributeName="width" values="0;0;188;188;0;0" keyTimes="0;0.26;0.66;0.67;0.68;1" dur="12s" begin="0s" repeatCount="indefinite"/>
+  </rect>
+  <circle r="7" fill="#6ea8fe" stroke="#a8c8ff" stroke-width="1">
+    <animateMotion path="M 140 190 H 540 L 600 192" dur="12s" begin="2s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.04;0.08;0.12;0.20;0.26;1" keyPoints="0;0.182;0.182;0.627;0.627;1;1"/>
+    <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.26;0.27;1" dur="12s" begin="2s" calcMode="discrete" repeatCount="indefinite"/>
+  </circle>
+  <rect x="606" y="209" width="0" height="5" rx="2" fill="#3f9e6c">
+    <animate attributeName="width" values="0;0;188;188;0;0" keyTimes="0;0.26;0.66;0.67;0.68;1" dur="12s" begin="2s" repeatCount="indefinite"/>
+  </rect>
+  <circle r="7" fill="#6ea8fe" stroke="#a8c8ff" stroke-width="1">
+    <animateMotion path="M 140 190 H 540 L 600 267" dur="12s" begin="4s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.04;0.08;0.12;0.20;0.26;1" keyPoints="0;0.182;0.182;0.627;0.627;1;1"/>
+    <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.26;0.27;1" dur="12s" begin="4s" calcMode="discrete" repeatCount="indefinite"/>
+  </circle>
+  <rect x="606" y="284" width="0" height="5" rx="2" fill="#3f9e6c">
+    <animate attributeName="width" values="0;0;188;188;0;0" keyTimes="0;0.26;0.66;0.67;0.68;1" dur="12s" begin="4s" repeatCount="indefinite"/>
+  </rect>
+  <circle r="7" fill="#6ea8fe" stroke="#a8c8ff" stroke-width="1">
+    <animateMotion path="M 140 190 H 540 L 600 117" dur="12s" begin="6s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.04;0.08;0.12;0.20;0.26;1" keyPoints="0;0.182;0.182;0.627;0.627;1;1"/>
+    <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.26;0.27;1" dur="12s" begin="6s" calcMode="discrete" repeatCount="indefinite"/>
+  </circle>
+  <rect x="606" y="134" width="0" height="5" rx="2" fill="#3f9e6c">
+    <animate attributeName="width" values="0;0;188;188;0;0" keyTimes="0;0.26;0.66;0.67;0.68;1" dur="12s" begin="6s" repeatCount="indefinite"/>
+  </rect>
+  <circle r="7" fill="#6ea8fe" stroke="#a8c8ff" stroke-width="1">
+    <animateMotion path="M 140 190 H 540 L 600 192" dur="12s" begin="8s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.04;0.08;0.12;0.20;0.26;1" keyPoints="0;0.182;0.182;0.627;0.627;1;1"/>
+    <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.26;0.27;1" dur="12s" begin="8s" calcMode="discrete" repeatCount="indefinite"/>
+  </circle>
+  <rect x="606" y="209" width="0" height="5" rx="2" fill="#3f9e6c">
+    <animate attributeName="width" values="0;0;188;188;0;0" keyTimes="0;0.26;0.66;0.67;0.68;1" dur="12s" begin="8s" repeatCount="indefinite"/>
+  </rect>
+  <circle r="7" fill="#6ea8fe" stroke="#a8c8ff" stroke-width="1">
+    <animateMotion path="M 140 190 H 540 L 600 267" dur="12s" begin="10s" repeatCount="indefinite" calcMode="linear" keyTimes="0;0.04;0.08;0.12;0.20;0.26;1" keyPoints="0;0.182;0.182;0.627;0.627;1;1"/>
+    <animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.26;0.27;1" dur="12s" begin="10s" calcMode="discrete" repeatCount="indefinite"/>
+  </circle>
+  <rect x="606" y="284" width="0" height="5" rx="2" fill="#3f9e6c">
+    <animate attributeName="width" values="0;0;188;188;0;0" keyTimes="0;0.26;0.66;0.67;0.68;1" dur="12s" begin="10s" repeatCount="indefinite"/>
+  </rect>
+  <text x="310" y="258" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#c9922f">header complete: parse, then pool_-&gt;submit</text>
+  <text x="700" y="316" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#3f9e6c">worker sets the socket back to blocking and streams the file</text>
+  <text x="20" y="344" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#8b949e">A huge transfer occupies one worker, never the loop. Path traversal and oversized headers are rejected on the loop thread first.</text>
+</svg>

@@ -21,28 +21,33 @@ infrastructure.
 
 ## Architecture
 
+```mermaid
+flowchart LR
+    clients["LAN clients<br/>HTTP/1.1 keep-alive"]
+
+    subgraph loop["epoll loop (main thread)"]
+        acc["accept4 with SOCK_NONBLOCK<br/>EPOLLIN | EPOLLET | EPOLLRDHUP"]
+        read["recv into the per-connection buffer<br/>reject headers over the size cap with 431"]
+        parse["parse_request<br/>waits for the header terminator"]
+    end
+
+    queue["ThreadPool job queue<br/>mutex + condition variable"]
+
+    subgraph workers["Worker threads"]
+        serve["serve_request<br/>resolve and validate the path<br/>stat, MIME by extension<br/>directory listing or sendfile"]
+    end
+
+    fs[("Served root directory")]
+
+    clients --> acc --> read --> parse
+    parse -->|"submit a copy of the request"| queue --> serve
+    serve -->|"64 KiB sendfile chunks"| clients
+    serve --> fs
+    parse -.->|"partial header: wait for more bytes"| read
 ```
-                +--------------------+
-   accept()     |  epoll event loop  |
-   nonblock --> |  (main thread,     |
-                |   edge-triggered)  |
-                +----+---------------+
-                     |
-   complete request  |   submit
-                     v
-                +--------------------+
-                |   ThreadPool       |
-                |  N workers         |
-                +----+---------------+
-                     |
-                     v
-                +--------------------+
-                |  serve_request     |
-                |  - resolve path    |
-                |  - mime + stat     |
-                |  - sendfile chunks |
-                +--------------------+
-```
+
+<img src="docs/epoll-thread-pool.svg" alt="Animated view of connections being accepted and parsed by the epoll loop, queued, and streamed by pool workers" width="880">
+
 
 The epoll thread only **reads bytes** until the request header is complete
 (detected by `\r\n\r\n`). Once parsed, the work is handed to a thread-pool
